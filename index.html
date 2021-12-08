@@ -58,8 +58,8 @@
             <nav>
               <div class="nav nav-tabs" id="nav-tab" role="tablist">
                 <button class="nav-link active text-danger" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Übersicht MFB</button>
-                <button class="nav-link text-danger" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">...</button>
-                <button class="nav-link text-danger" id="nav-mfb-tab" data-bs-toggle="tab" data-bs-target="#nav-mfb" type="button" role="tab" aria-controls="nav-mfb" aria-selected="false">...</button>
+                <button class="nav-link text-danger" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Wochensicht Gruppe</button>
+                <button class="nav-link text-danger" id="nav-mfb-tab" data-bs-toggle="tab" data-bs-target="#nav-mfb" type="button" role="tab" aria-controls="nav-mfb" aria-selected="false">Wochensicht Zugnummer</button>
                 <button class="nav-link text-danger" id="nav-red-tab" data-bs-toggle="tab" data-bs-target="#nav-red" type="button" role="tab" aria-controls="nav-red" aria-selected="false">...</button>
                 <button class="nav-link text-light" id="nav-saved-tab" data-bs-toggle="tab" data-bs-target="#nav-saved" type="button" role="tab" aria-controls="nav-saved" aria-selected="false">...</button>
                 <button class="nav-link text-light" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab" aria-controls="nav-edit" aria-selected="false">...</button>
@@ -72,7 +72,7 @@
                     <thead>
                       <tr>
                         <th>Betroffenheit durch Bau</th>
-                        <th>Anzahl Züge</th>
+                        <th>Summe Verkehrstage der betroffenen Züge</th>
                         <th>&nbsp;</th>
                       </tr>
                     </thead>
@@ -81,17 +81,74 @@
                         <td>{{tr.name}}</td>
                         <td>{{tr.trains.length}}</td>
                         <td>
-                          <button type="button btn-sm" ng-click="" class="btn btn-outline-secondary">
+                          <button type="button btn-sm" ng-click="zvFList.showGroup(tr.id);" class="btn btn-outline-secondary">
                             <i class="far fa-hand-pointer"></i>
-                        </button>
+                          </button>
                         </td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
               </div>
-            </div>
+
+              <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <div class="col-md-8">
+                  <h4>Wochensicht {{zvFList.selGroup}}</h4>
+                    <table class="table table-hover">
+                      <thead>
+                        <tr>
+                          <th>Rz/Gz</th>
+                          <th>Zugnummer</th>
+                          <th>Verkehrstage</th>
+                          <th>&nbsp;</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr ng-repeat="tr in zvFList.DetailGroup | orderBy:['-type', 'znr']">
+                          <td>
+                            <span class="nimate-show-hide ng-show" ng-show="tr.type==='G'"><i class="fas fa-trailer"></i></span>
+                            <span class="nimate-show-hide ng-show" ng-show="tr.type==='R'"><i class="fas fa-hot-tub"></i></span>
+                          </td>
+                          <td>{{tr.znr}}</td>
+                          <td>{{tr.dayList}}</td>
+                          <td>
+                            <button type="button btn-sm" ng-click="zvFList.showTrain(tr.znr, tr.days);" class="btn btn-outline-secondary">
+                              <i class="fas fa-pencil-alt"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>                                    
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="nav-mfb" role="tabpanel" aria-labelledby="nav-mfb-tab">
+                <div class="col-md-10">
+                  <h4>Zugnummer {{zvFList.selTrain}}</h4>
+                    <table class="table">                      
+                        <tr>
+                          <td ng-repeat="d in zvFList.TrainDetail">
+                            <table class="table table-sm">
+                              <tr class="table-dark">
+                                <th>Verkehrstag</th>
+                                <th>{{d.day.DText}}</th>
+                              </tr>
+                              <tr ng-repeat="tr in d.trains | orderBy:['Konflikt.DNumber']">
+                                <td ng-style="{'background-color': tr.Color, 'color': 'white'}"><i class="fas fa-globe-africa"></i> <b>{{tr.Region}}</b><br><i class="fas fa-road"></i> {{tr.Streckennummer}}<br>{{tr.Vorgangsnummer}}<br><i class="fas fa-calendar-day"></i> {{tr.Konflikt.Day}}</td>
+                                <td ng-style="{'background-color': tr.Color, 'color': 'white'}">&nbsp;<br><i class="fas fa-map-marker-alt"></i> {{tr.Betriebsstelle}}<br><i class="fas fa-snowplow"></i> {{tr['Art der bVE']}}<br><i class="far fa-clock"></i> {{tr.Konflikt.Time}}</td>
+                              </tr>
+                            </table>
+                          </td>                          
+                        </tr>
+                    </table>                                    
+                </div>
+              </div>
+
+
+            </div> 
           </div>
+
+          
                     
 
         </div>
