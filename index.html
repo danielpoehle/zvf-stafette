@@ -20,6 +20,7 @@
     
     <script src="./hlp/csvtojson.min.js"></script>
     <script src="./hlp/luxon.min.js"></script>
+    <script src="./hlp/underscore-umd-min.js"></script>
     <script src="./app.js"></script>        
   </head>
 
@@ -45,7 +46,7 @@
                 <input type="file" id="list" class="form-control form-control-lg" ng-model="zvFList.Filename" accept=".csv" placeholder="Liste auswählen"> <p></p>
                 <p><b>Achtung</b> Es werden keinerlei Daten ins Netz hochgeladen. Der Verarbeitung der Daten und Erzeugung der Tabellen erfolgt ausschließlich auf dem lokalen Rechner.</p>
   
-                <button type="button" class="btn btn-secondary btn-lg" ng-click="zvFList.findOverload();">
+                <button type="button" class="btn btn-secondary btn-lg" ng-click="zvFList.assignTrains();">
                     <i class="far fa-file-alt"></i>                    
                     Daten einlesen und verarbeiten
                 </button>
@@ -56,18 +57,37 @@
           <div class="animate-show-hide ng-show" ng-show="zvFList.loadComplete">
             <nav>
               <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                <button class="nav-link active text-danger" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Streckenanalyse</button>
-                <button class="nav-link text-danger" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Details Auslastung</button>
-                <button class="nav-link text-danger" id="nav-mfb-tab" data-bs-toggle="tab" data-bs-target="#nav-mfb" type="button" role="tab" aria-controls="nav-mfb" aria-selected="false">Umleitungen bearbeiten</button>
-                <button class="nav-link text-danger" id="nav-red-tab" data-bs-toggle="tab" data-bs-target="#nav-red" type="button" role="tab" aria-controls="nav-red" aria-selected="false">Vorgang anlegen</button>
-                <button class="nav-link text-light" id="nav-saved-tab" data-bs-toggle="tab" data-bs-target="#nav-saved" type="button" role="tab" aria-controls="nav-saved" aria-selected="false">Routen</button>
-                <button class="nav-link text-light" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab" aria-controls="nav-edit" aria-selected="false">Log</button>
+                <button class="nav-link active text-danger" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Übersicht MFB</button>
+                <button class="nav-link text-danger" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">...</button>
+                <button class="nav-link text-danger" id="nav-mfb-tab" data-bs-toggle="tab" data-bs-target="#nav-mfb" type="button" role="tab" aria-controls="nav-mfb" aria-selected="false">...</button>
+                <button class="nav-link text-danger" id="nav-red-tab" data-bs-toggle="tab" data-bs-target="#nav-red" type="button" role="tab" aria-controls="nav-red" aria-selected="false">...</button>
+                <button class="nav-link text-light" id="nav-saved-tab" data-bs-toggle="tab" data-bs-target="#nav-saved" type="button" role="tab" aria-controls="nav-saved" aria-selected="false">...</button>
+                <button class="nav-link text-light" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab" aria-controls="nav-edit" aria-selected="false">...</button>
               </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">              
               <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
                 <div class="col-md-8">
-                  Test Test Test
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Betroffenheit durch Bau</th>
+                        <th>Anzahl Züge</th>
+                        <th>&nbsp;</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="tr in zvFList.Groups | orderBy:['-id']">
+                        <td>{{tr.name}}</td>
+                        <td>{{tr.trains.length}}</td>
+                        <td>
+                          <button type="button btn-sm" ng-click="" class="btn btn-outline-secondary">
+                            <i class="far fa-hand-pointer"></i>
+                        </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
             </div>
