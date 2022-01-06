@@ -60,7 +60,7 @@
                 <button class="nav-link active text-danger" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" type="button" role="tab" aria-controls="nav-home" aria-selected="true">Übersicht MFB</button>
                 <button class="nav-link text-danger" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Wochensicht Gruppe</button>
                 <button class="nav-link text-danger" id="nav-mfb-tab" data-bs-toggle="tab" data-bs-target="#nav-mfb" type="button" role="tab" aria-controls="nav-mfb" aria-selected="false">Wochensicht Zugnummer</button>
-                <button class="nav-link text-danger" id="nav-red-tab" data-bs-toggle="tab" data-bs-target="#nav-red" type="button" role="tab" aria-controls="nav-red" aria-selected="false">...</button>
+                <button class="nav-link text-danger" id="nav-red-tab" data-bs-toggle="tab" data-bs-target="#nav-red" type="button" role="tab" aria-controls="nav-red" aria-selected="false">Abarbeitung Stafette</button>
                 <button class="nav-link text-light" id="nav-saved-tab" data-bs-toggle="tab" data-bs-target="#nav-saved" type="button" role="tab" aria-controls="nav-saved" aria-selected="false">...</button>
                 <button class="nav-link text-light" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab" aria-controls="nav-edit" aria-selected="false">...</button>
               </div>
@@ -106,8 +106,8 @@
                       <tbody>
                         <tr ng-repeat="tr in zvFList.DetailGroup | orderBy:['-type', 'znr']">
                           <td>
-                            <span class="nimate-show-hide ng-show" ng-show="tr.type==='G'"><i class="fas fa-trailer"></i></span>
-                            <span class="nimate-show-hide ng-show" ng-show="tr.type==='R'"><i class="fas fa-hot-tub"></i></span>
+                            <span class="animate-show-hide ng-show" ng-show="tr.type==='G'"><i class="fas fa-trailer"></i></span>
+                            <span class="animate-show-hide ng-show" ng-show="tr.type==='R'"><i class="fas fa-hot-tub"></i></span>
                           </td>
                           <td>{{tr.znr}}</td>
                           <td>{{tr.dayList}}</td>
@@ -124,10 +124,22 @@
 
               <div class="tab-pane fade" id="nav-mfb" role="tabpanel" aria-labelledby="nav-mfb-tab">
                 <div class="col-md-10">
-                  <h4>Zugnummer {{zvFList.selTrain}}</h4>
+                  <h4>
+                    Zugnummer {{zvFList.selTrain}}
+                    <span class="animate-show-hide ng-show" ng-show="zvFList.TrainDetail[0].type==='G'"><i class="fas fa-trailer"></i></span>
+                    <span class="animate-show-hide ng-show" ng-show="zvFList.TrainDetail[0].type==='R'"><i class="fas fa-hot-tub"></i></span>
+                  </h4>
+                  
                     <table class="table">                      
                         <tr>
                           <td ng-repeat="d in zvFList.TrainDetail">
+                            <table class="table table-sm table-borderless">
+                              <tr>
+                                <td><button type="button" ng-click="zvFList.setOrder(d, true);" class="btn btn-secondary btn-lg"><i class="far fa-arrow-alt-circle-down"></i></button></td>
+                                <td><button type="button" ng-click="zvFList.setOrder(d, false);" class="btn btn-secondary btn-lg"><i class="far fa-arrow-alt-circle-up"></i></button></td>
+                                <td>{{d.dir}}</td>
+                              </tr>
+                            </table>
                             <table class="table table-sm">
                               <tr class="table-dark">
                                 <th>Verkehrstag</th>
@@ -141,6 +153,101 @@
                           </td>                          
                         </tr>
                     </table>                                    
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="nav-red" role="tabpanel" aria-labelledby="nav-red-tab">
+                <div class="col-md-10">
+                  <h4>Auswahl Region</h4>
+                  <table class="table table-sm table-borderless">                    
+                    <tr>
+                      <td>
+                        <button type="button" class="animate-show-hide ng-show btn btn-secondary btn-lg" ng-show="zvFList.selRegion === 'NORD'">Nord</button>
+                        <button type="button" class="animate-show-hide ng-show btn btn-outline-secondary btn-lg" ng-click="zvFList.setRegion('NORD');" ng-hide="zvFList.selRegion === 'NORD'">Nord</button>
+                      </td>
+                      <td>
+                        <button type="button" class="animate-show-hide ng-show btn btn-secondary btn-lg" ng-show="zvFList.selRegion === 'OST'">Ost</button>
+                        <button type="button" class="animate-show-hide ng-show btn btn-outline-secondary btn-lg" ng-click="zvFList.setRegion('OST');" ng-hide="zvFList.selRegion === 'OST'">Ost</button>
+                      </td>
+                      <td>
+                        <button type="button" class="animate-show-hide ng-show btn btn-secondary btn-lg" ng-show="zvFList.selRegion === 'SÜDOST'">Südost</button>
+                        <button type="button" class="animate-show-hide ng-show btn btn-outline-secondary btn-lg" ng-click="zvFList.setRegion('SÜDOST');" ng-hide="zvFList.selRegion === 'SÜDOST'">Südost</button>
+                      </td>
+                      <td>
+                        <button type="button" class="animate-show-hide ng-show btn btn-secondary btn-lg" ng-show="zvFList.selRegion === 'MITTE'">Mitte</button>
+                        <button type="button" class="animate-show-hide ng-show btn btn-outline-secondary btn-lg" ng-click="zvFList.setRegion('MITTE');" ng-hide="zvFList.selRegion === 'MITTE'">Mitte</button>
+                      </td>
+                      <td>
+                        <button type="button" class="animate-show-hide ng-show btn btn-secondary btn-lg" ng-show="zvFList.selRegion === 'WEST'">West</button>
+                        <button type="button" class="animate-show-hide ng-show btn btn-outline-secondary btn-lg" ng-click="zvFList.setRegion('WEST');" ng-hide="zvFList.selRegion === 'WEST'">West</button>
+                      </td>
+                      <td>
+                        <button type="button" class="animate-show-hide ng-show btn btn-secondary btn-lg" ng-show="zvFList.selRegion === 'SÜDWEST'">Südwest</button>
+                        <button type="button" class="animate-show-hide ng-show btn btn-outline-secondary btn-lg" ng-click="zvFList.setRegion('SÜDWEST');" ng-hide="zvFList.selRegion === 'SÜDWEST'">Südwest</button>
+                      </td>
+                      <td>
+                        <button type="button" class="animate-show-hide ng-show btn btn-secondary btn-lg" ng-show="zvFList.selRegion === 'SÜD'">Süd</button>
+                        <button type="button" class="animate-show-hide ng-show btn btn-outline-secondary btn-lg" ng-click="zvFList.setRegion('SÜD');" ng-hide="zvFList.selRegion === 'SÜD'">Süd</button>
+                      </td>
+                    </tr>
+                  </table>
+
+                  <h4>Baubetroffenheit je Korridor</h4>
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Korridor</th>
+                        <th>Prioritäre Züge</th>
+                        <th>Gesamtzahl Züge <i class="fas fa-dot-circle"></i> Verkehrstage</th>
+                        <th>&nbsp;</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="tr in zvFList.regBTK | orderBy:['-PRIO', '-ANZ']">
+                        <td>{{tr.BTK}}</td>
+                        <td>{{tr.PRIO}}</td>
+                        <td>{{tr.ANZ}}</td>
+                        <td>
+                          <button type="button btn-sm" ng-click="zvFList.showCorridor(tr.id);" class="btn btn-outline-secondary">
+                            <i class="far fa-hand-pointer"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="tab-pane fade" id="nav-saved" role="tabpanel" aria-labelledby="nav-saved-tab">
+                <div class="col-md-11">
+                  <h4>Region {{zvFList.selRegion}}, Korridor {{zvFList.selBTK[0].BTK}}</h4>
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Tag</th>
+                        <th>Rz/Gz</th>
+                        <th>Zugnummer</th>                        
+                        <th>Wichtigkeit</th>
+                        <th>Bearbeitung</th>
+                        <th>&nbsp;</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="tr in zvFList.selBTK | orderBy:['K_DAY.DNumber']">
+                        <td>{{tr.K_DAY.Day}}</td>
+                        <td>
+                          <span class="animate-show-hide ng-show" ng-show="tr.TYPE==='G'"><i class="fas fa-trailer"></i></span>
+                          <span class="animate-show-hide ng-show" ng-show="tr.TYPE==='R'"><i class="fas fa-hot-tub"></i></span>
+                        </td>
+                        <td>{{tr.ZNR}}</td>
+                        <td>{{tr.WEIGHT}}</td>
+                        <td>{{tr.DIR}}</td>
+                        <td>
+                          .
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
               </div>
 

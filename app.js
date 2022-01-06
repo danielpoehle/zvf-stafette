@@ -10,6 +10,7 @@
         let zvFList = this;
 
         zvFList.Filename = 'bla';
+        zvFList.selRegion = '';
         zvFList.loadComplete = false;
         zvFList.startDate = luxon.DateTime.fromFormat('01.12.2021', 'dd.MM.yyyy');
         zvFList.BauList = [];
@@ -18,6 +19,9 @@
         zvFList.selGroup = '';
         zvFList.TrainDetail = [];
         zvFList.selTrain = '';
+        zvFList.BTKlist = [];
+        zvFList.regBTK = [];
+        zvFList.selBTK = [];
         
 
         zvFList.assignTrains = function(){
@@ -112,14 +116,67 @@
             days = days.filter((item, index) => days.indexOf(item)===index).sort();
             for (let i = 0; i < days.length; i+=1) {                
                 const tr = lst.filter(t => t.Verkehrstag.DNumber === days[i]);
+                let dir = zvFList.BTKlist.findIndex((t) => t.VTSZNR === tr[0].VTSZNR);
+                dir = dir === -1? '' : zvFList.BTKlist[dir].DIR;
                 zvFList.TrainDetail.push({
                     'day': tr[0].Verkehrstag,
                     'znr': tr[0].Zugnummer,
                     'type': tr[0].ZugartFv,
-                    'trains': tr
+                    'trains': tr,
+                    'dir': dir
                 });                                
             }
             document.getElementById("nav-mfb-tab").click();
+        };
+
+        zvFList.setOrder = function(d, ascending){
+            let orderedTrains = ascending? d.trains.sort((a,b) => a.Konflikt.DNumber-b.Konflikt.DNumber): d.trains.sort((a,b) => b.Konflikt.DNumber-a.Konflikt.DNumber);
+            zvFList.BTKlist = zvFList.BTKlist.filter((t) => t.VTSZNR !== orderedTrains[0].VTSZNR);
+            d.dir = ascending? 'Vorwärts' : 'Rückwärts';
+            for (let i = 0; i < orderedTrains.length; i+=1) {
+                zvFList.BTKlist.push({
+                    'BTK': orderedTrains[i].Vorgangsnummer,
+                    'VTSZNR': orderedTrains[i].VTSZNR,
+                    'ZNR': orderedTrains[i].Zugnummer,
+                    'TYPE': orderedTrains[i].ZugartFv,
+                    'V_DAY': orderedTrains[i].Verkehrstag,
+                    'K_DAY': orderedTrains[i].Konflikt,
+                    'DIR': ascending? 'Vorwärts' : 'Rückwärts',
+                    'ORD': i,
+                    'FINISH': false,
+                    'CUR_WORK': i===0? true : false,
+                    'WEIGHT': orderedTrains.length-i,
+                    'REGION': orderedTrains[i].Region
+                });                
+            }
+            //console.log(zvFList.BTKlist);
+        };
+
+        zvFList.setRegion = function(rg){
+            zvFList.regBTK = [];
+            zvFList.selRegion = rg;
+            let filtered = zvFList.BTKlist.filter((t) => t.REGION === rg);
+            let btk = filtered.map((t) => t.BTK);
+            btk = btk.filter((item, index) => btk.indexOf(item)===index).sort();
+            for (let ind = 0; ind < btk.length; ind+=1) {
+                let d = filtered.filter((t) => t.BTK === btk[ind]);
+                let prio = d.map((t) => {if(t.WEIGHT>1 && t.CUR_WORK) {return 1;} else{return 0;}}).reduce((pv, cv) => {return pv+cv}, 0);
+                let znr = d.map((t) => t.VTSZNR);
+                znr = znr.filter((item, index) => znr.indexOf(item)===index);
+                zvFList.regBTK.push({
+                    'id': ind,
+                    'BTK': btk[ind],
+                    'PRIO': prio,
+                    'ANZ': znr.length,
+                    'trains': d
+                });
+                
+            }
+        };
+
+        zvFList.showCorridor = function(id){
+            zvFList.selBTK = zvFList.regBTK.find((t) => t.id === id).trains;
+            document.getElementById("nav-saved-tab").click();
         };
 
         function getCol(region){
