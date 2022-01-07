@@ -197,16 +197,20 @@
                     <thead>
                       <tr>
                         <th>Korridor</th>
-                        <th>Prioritäre Züge</th>
-                        <th>Gesamtzahl Züge <i class="fas fa-dot-circle"></i> Verkehrstage</th>
+                        <th>Prioritäre Züge mit MFB</th>
+                        <th>Gesamtzahl Züge mit MFB <i class="fas fa-dot-circle"></i> Verkehrstage</th>
+                        <th>Bearbeitbare Züge mit MFB</th>
+                        <th>Erledigte Züge mit MFB</th>
                         <th>&nbsp;</th>
                       </tr>
                     </thead>
                     <tbody>
-                      <tr ng-repeat="tr in zvFList.regBTK | orderBy:['-PRIO', '-ANZ']">
+                      <tr ng-repeat="tr in zvFList.regBTK | orderBy:['-PRIO', '-ACTIVE', '-ANZ']">
                         <td>{{tr.BTK}}</td>
                         <td>{{tr.PRIO}}</td>
                         <td>{{tr.ANZ}}</td>
+                        <td>{{tr.ACTIVE}} / {{tr.ANZ}}</td>
+                        <td>{{tr.FINISH}} / {{tr.ANZ}}</td>
                         <td>
                           <button type="button btn-sm" ng-click="zvFList.showCorridor(tr.id);" class="btn btn-outline-secondary">
                             <i class="far fa-hand-pointer"></i>
@@ -221,29 +225,174 @@
               <div class="tab-pane fade" id="nav-saved" role="tabpanel" aria-labelledby="nav-saved-tab">
                 <div class="col-md-11">
                   <h4>Region {{zvFList.selRegion}}, Korridor {{zvFList.selBTK[0].BTK}}</h4>
+                  <hr>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <h6>Ausregelung</h6>
+                      <table class="table table-borderless">
+                        <tr>
+                          <td>
+                            <i class="far fa-clock"></i>
+                            Abweichung gegenüber Planlage {{zvFList.delay}} min
+                          </td>
+                          <td>
+                            <button type="button btn-sm" ng-click="zvFList.changeDelay(-30);" class="btn btn-secondary">-30</button>
+                            <button type="button btn-sm" ng-click="zvFList.changeDelay(-10);" class="btn btn-secondary">-10</button>
+                            <button type="button btn-sm" ng-click="zvFList.changeDelay(-5);" class="btn btn-secondary">-5</button>
+                            <button type="button btn-sm" ng-click="zvFList.changeDelay(-1);" class="btn btn-secondary">-1</button>
+                            <button type="button btn-sm" ng-click="zvFList.changeDelay(0, true);" class="btn btn-danger">0</button>
+                            <button type="button btn-sm" ng-click="zvFList.changeDelay(1);" class="btn btn-secondary">+1</button>
+                            <button type="button btn-sm" ng-click="zvFList.changeDelay(5);" class="btn btn-secondary">+5</button>
+                            <button type="button btn-sm" ng-click="zvFList.changeDelay(10);" class="btn btn-secondary">+10</button>
+                            <button type="button btn-sm" ng-click="zvFList.changeDelay(30);" class="btn btn-secondary">+30</button>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td>    
+                            <i class="fas fa-comment-medical"></i>                    
+                            Kommentar 
+                          </td>
+                          <td>
+                            <div class="mb-3">
+                              <label for="exampleFormControlTextarea1" class="form-label"></label>
+                              <textarea class="form-control" ng-model="zvFList.comment" id="exampleFormControlTextarea1" rows="2"></textarea>
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>                
+                    <div class="col-md-6">
+                      <h6>Überblick Bearbeitung Stafette</h6>
+                      <table class="table table-sm animate-show-hide ng-show" ng-show="zvFList.StafetteStatus.length>0">
+                        <thead>
+                          <tr>
+                            <th>Zugnummer</th>
+                            <th>Betroffenheit</th>
+                            <th>Region</th>
+                            <th>Korridor</th>
+                            <th>BTS</th>
+                            <th>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr ng-repeat="tr in zvFList.StafetteStatus | orderBy:['K_DAY.DNumber']">
+                            <td>{{tr.ZNR}}</td>
+                            <td><i class="fas fa-calendar-day"></i> {{tr.K_DAY.Day}} <i class="fas fa-clock"></i> {{tr.K_DAY.Time}}</td>
+                            <td>{{tr.REGION}}</td>
+                            <td>
+                              {{tr.BTK}} 
+                              <span class="animate-show-hide ng-show" ng-show="tr.BTK === zvFList.selBTK[0].BTK">
+                                <i class="fas fa-map-marker-alt"></i>
+                              </span>
+                            </td>
+                            <td>{{tr.BTS}}</td>
+                            <td>                              
+                              <span class="animate-show-hide ng-show" ng-show="tr.CUR_WORK"><i class="fas fa-cog"></i></span>
+                              <span class="animate-show-hide ng-show" ng-hide="tr.CUR_WORK || tr.FINISH"><i class="fas fa-hourglass-half"></i></span>
+                              <span class="animate-show-hide ng-show" ng-show="tr.FINISH"><i class="fas fa-flag-checkered"></i></span>
+                              <span class="animate-show-hide ng-show" ng-show="tr.CUR_WORK && tr.DIR==='Vorwärts'"> <i class="fas fa-angle-double-down"></i> </span>
+                              <span class="animate-show-hide ng-show" ng-show="tr.CUR_WORK && tr.DIR==='Rückwärts'"> <i class="fas fa-angle-double-up"></i> </span>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>                    
+                  <hr>
                   <table class="table table-hover">
                     <thead>
                       <tr>
-                        <th>Tag</th>
+                        <th>Betroffenheit</th>
                         <th>Rz/Gz</th>
                         <th>Zugnummer</th>                        
-                        <th>Wichtigkeit</th>
+                        <th>Wichtigkeit</th>                        
+                        <th>Vorgänger <i class="fas fa-snowplow"></i></th>
+                        <th>Nachfolger <i class="fas fa-snowplow"></i></th>
+                        <th>Übergabe</th>
                         <th>Bearbeitung</th>
                         <th>&nbsp;</th>
                       </tr>
                     </thead>
                     <tbody>
                       <tr ng-repeat="tr in zvFList.selBTK | orderBy:['K_DAY.DNumber']">
-                        <td>{{tr.K_DAY.Day}}</td>
+                        <td><i class="fas fa-calendar-day"></i> {{tr.K_DAY.Day}} <i class="fas fa-clock"></i> {{tr.K_DAY.Time}}</td>
                         <td>
                           <span class="animate-show-hide ng-show" ng-show="tr.TYPE==='G'"><i class="fas fa-trailer"></i></span>
                           <span class="animate-show-hide ng-show" ng-show="tr.TYPE==='R'"><i class="fas fa-hot-tub"></i></span>
                         </td>
                         <td>{{tr.ZNR}}</td>
-                        <td>{{tr.WEIGHT}}</td>
-                        <td>{{tr.DIR}}</td>
+                        <td>{{tr.WEIGHT}}</td>                        
                         <td>
-                          .
+                          <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Vorwärts'"> {{zvFList.getBM(tr.PRE_ID)}} </span>
+                          <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Rückwärts'"> {{zvFList.getBM(tr.POST_ID)}} </span>
+                        </td>
+                        <td>
+                          <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Vorwärts'"> {{zvFList.getBM(tr.POST_ID)}} </span>
+                          <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Rückwärts'"> {{zvFList.getBM(tr.PRE_ID)}} </span>
+                        </td>
+                        <td>
+                          <div class="animate-show-hide ng-show" ng-hide="tr.DELAY_INC === '' && tr.COMMENT_INC === ''">
+                            <span class="animate-show-hide ng-show" ng-show="tr.DELAY_INC !== '' && tr.DELAY_INC>=0">
+                              Verspätung {{tr.DELAY_INC}} min
+                            </span>
+                            <span class="animate-show-hide ng-show" ng-show="tr.DELAY_INC !== '' && tr.DELAY_INC<0">
+                              Vorplanfahrt {{-tr.DELAY_INC}} min
+                            </span>
+                            <div class="animate-show-hide ng-show" ng-hide="tr.COMMENT_INC === ''">
+                              {{tr.COMMENT_INC}}
+                            </div>
+                          </div>
+                        </td>
+                        <td>                          
+                          {{tr.DIR}}
+                          <span class="animate-show-hide ng-show" ng-show="tr.CUR_WORK"><i class="fas fa-cog"></i></span>
+                          <span class="animate-show-hide ng-show" ng-hide="tr.CUR_WORK || tr.FINISH"><i class="fas fa-hourglass-half"></i></span>
+                          <span class="animate-show-hide ng-show" ng-show="tr.FINISH"><i class="fas fa-flag-checkered"></i></span>
+                        </td>
+                        <td>
+                          <button type="button btn-sm" ng-click="zvFList.getStafetteStatus(tr.VTSZNR);" class="btn btn-dark">
+                            <i class="fas fa-search"></i>
+                          </button>
+                          <button type="button btn-sm" ng-click="" class="btn btn-danger">
+                            <i class="fas fa-exclamation-triangle"></i>
+                          </button>
+                          
+                          <button type="button btn-sm" ng-click="zvFList.setComment(tr.ID);" class="btn btn-secondary animate-show-hide ng-show" ng-show="tr.CUR_WORK">
+                            <i class="fas fa-comment-medical"></i>
+                          </button>
+                          <button type="button btn-sm" ng-click="" class="btn btn-outline-secondary animate-show-hide ng-show disabled" ng-show="!tr.CUR_WORK">
+                            <i class="fas fa-comment-medical"></i>
+                          </button>
+
+                          <button type="button btn-sm" ng-click="zvFList.setDelay(tr.ID);" class="btn btn-secondary animate-show-hide ng-show" ng-show="tr.CUR_WORK">
+                            <i class="far fa-clock"></i>
+                          </button>
+                          <button type="button btn-sm" ng-click="" class="btn btn-outline-secondary animate-show-hide ng-show disabled" ng-show="!tr.CUR_WORK">
+                            <i class="far fa-clock"></i>
+                          </button>
+
+                          <button type="button btn-sm" ng-click="zvFList.transferDelay(tr.ID);" class="btn btn-success animate-show-hide ng-show" ng-show="tr.CUR_WORK && tr.DELAY_HERE!==''">                            
+                            <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Rückwärts' && tr.POST_ID>0"> <i class="fas fa-step-backward"></i> Übergabe </span>
+                            <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Vorwärts' && tr.POST_ID>0"> Übergabe <i class="fas fa-step-forward"></i> </span>
+                            <span class="animate-show-hide ng-show" ng-show="tr.POST_ID===-1"> Fertig <i class="fas fa-flag-checkered"></i> </span>
+                          </button>
+                          <button type="button btn-sm" ng-click="" class="btn btn-outline-success animate-show-hide ng-show disabled" ng-show="!tr.CUR_WORK || tr.DELAY_HERE===''">                            
+                            <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Rückwärts' && tr.POST_ID>0"> <i class="fas fa-step-backward"></i> Übergabe </span>
+                            <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Vorwärts' && tr.POST_ID>0"> Übergabe <i class="fas fa-step-forward"></i> </span>
+                            <span class="animate-show-hide ng-show" ng-show="tr.POST_ID===-1"> Fertig <i class="fas fa-flag-checkered"></i> </span>
+                          </button>
+
+                          <div class="animate-show-hide ng-show" ng-hide="tr.DELAY_HERE === '' && tr.COMMENT_HERE === ''">
+                            <span class="animate-show-hide ng-show" ng-show="tr.DELAY_HERE !== '' && tr.DELAY_HERE>=0">
+                              Verspätung {{tr.DELAY_HERE}} min
+                            </span>
+                            <span class="animate-show-hide ng-show" ng-show="tr.DELAY_HERE !== '' && tr.DELAY_HERE<0">
+                              Vorplanfahrt {{-tr.DELAY_HERE}} min
+                            </span>
+                            <div class="animate-show-hide ng-show" ng-hide="tr.COMMENT_HERE === ''">
+                              {{tr.COMMENT_HERE}}
+                            </div>
+                          </div>
                         </td>
                       </tr>
                     </tbody>

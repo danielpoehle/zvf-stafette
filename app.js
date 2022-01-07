@@ -22,6 +22,9 @@
         zvFList.BTKlist = [];
         zvFList.regBTK = [];
         zvFList.selBTK = [];
+        zvFList.delay = 0;
+        zvFList.comment = '';
+        zvFList.StafetteStatus = [];
         
 
         zvFList.assignTrains = function(){
@@ -133,8 +136,11 @@
             let orderedTrains = ascending? d.trains.sort((a,b) => a.Konflikt.DNumber-b.Konflikt.DNumber): d.trains.sort((a,b) => b.Konflikt.DNumber-a.Konflikt.DNumber);
             zvFList.BTKlist = zvFList.BTKlist.filter((t) => t.VTSZNR !== orderedTrains[0].VTSZNR);
             d.dir = ascending? 'Vorwärts' : 'Rückwärts';
+            let indArray = zvFList.BTKlist.map((t) => t.ID);
+            let maxInd = Math.max(0, ...indArray);
             for (let i = 0; i < orderedTrains.length; i+=1) {
                 zvFList.BTKlist.push({
+                    'ID': maxInd + i + 1,
                     'BTK': orderedTrains[i].Vorgangsnummer,
                     'VTSZNR': orderedTrains[i].VTSZNR,
                     'ZNR': orderedTrains[i].Zugnummer,
@@ -146,13 +152,21 @@
                     'FINISH': false,
                     'CUR_WORK': i===0? true : false,
                     'WEIGHT': orderedTrains.length-i,
-                    'REGION': orderedTrains[i].Region
+                    'PRE_ID': i===0? -1 : maxInd + i,
+                    'POST_ID': i===orderedTrains.length-1? -1 : maxInd + i + 2,
+                    'DELAY_HERE': '',
+                    'COMMENT_HERE': '',
+                    'DELAY_INC': '',
+                    'COMMENT_INC': '',
+                    'REGION': orderedTrains[i].Region,
+                    'BTS': orderedTrains[i].Betriebsstelle
                 });                
             }
-            //console.log(zvFList.BTKlist);
+            console.log(zvFList.BTKlist);
         };
 
         zvFList.setRegion = function(rg){
+            zvFList.StafetteStatus = [];
             zvFList.regBTK = [];
             zvFList.selRegion = rg;
             let filtered = zvFList.BTKlist.filter((t) => t.REGION === rg);
@@ -161,6 +175,8 @@
             for (let ind = 0; ind < btk.length; ind+=1) {
                 let d = filtered.filter((t) => t.BTK === btk[ind]);
                 let prio = d.map((t) => {if(t.WEIGHT>1 && t.CUR_WORK) {return 1;} else{return 0;}}).reduce((pv, cv) => {return pv+cv}, 0);
+                let active = d.map((t) => {if(t.CUR_WORK) {return 1;} else{return 0;}}).reduce((pv, cv) => {return pv+cv}, 0);
+                let finish = d.map((t) => {if(t.FINISH) {return 1;} else{return 0;}}).reduce((pv, cv) => {return pv+cv}, 0);
                 let znr = d.map((t) => t.VTSZNR);
                 znr = znr.filter((item, index) => znr.indexOf(item)===index);
                 zvFList.regBTK.push({
@@ -168,15 +184,55 @@
                     'BTK': btk[ind],
                     'PRIO': prio,
                     'ANZ': znr.length,
+                    'ACTIVE': active,
+                    'FINISH': finish,
                     'trains': d
                 });
                 
             }
         };
 
+        zvFList.getStafetteStatus = function(vtsznr){
+            zvFList.StafetteStatus = zvFList.BTKlist.filter((t) => t.VTSZNR === vtsznr);
+        };
+
         zvFList.showCorridor = function(id){
             zvFList.selBTK = zvFList.regBTK.find((t) => t.id === id).trains;
             document.getElementById("nav-saved-tab").click();
+        };
+
+        zvFList.getBM = function(id){
+            if(id === -1){return "";}
+            let btk = zvFList.BTKlist.find((t) => t.ID === id);
+            return (btk.BTS + " (" + btk.REGION + ")");
+        };
+
+        zvFList.changeDelay = function(time, absolute = false){
+            if(absolute){zvFList.delay = time;}
+            else{zvFList.delay += time;}            
+        };
+
+        zvFList.setDelay = function(id){
+            zvFList.BTKlist.find((t) => t.ID === id).DELAY_HERE = zvFList.delay;
+        };
+
+        zvFList.setComment = function(id){
+            zvFList.BTKlist.find((t) => t.ID === id).COMMENT_HERE = zvFList.comment;
+        };
+
+        zvFList.transferDelay = function(id){
+            let currentCorridor = zvFList.BTKlist.find((t) => t.ID === id);
+            currentCorridor.CUR_WORK = false;
+            currentCorridor.FINISH = true;
+            zvFList.comment = '';
+            zvFList.delay = 0;
+
+            if(currentCorridor.POST_ID > 0){
+                let nextCorridor = zvFList.BTKlist.find((t) => t.ID === currentCorridor.POST_ID); 
+                nextCorridor.CUR_WORK = true;
+                nextCorridor.DELAY_INC = currentCorridor.DELAY_HERE;
+                nextCorridor.COMMENT_INC = currentCorridor.COMMENT_HERE;
+            }            
         };
 
         function getCol(region){
