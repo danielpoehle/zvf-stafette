@@ -315,22 +315,22 @@
                     </thead>
                     <tbody>
                       <tr ng-repeat="tr in zvFList.selBTK | orderBy:['K_DAY.DNumber']">
-                        <td><i class="fas fa-calendar-day"></i> {{tr.K_DAY.Day}} <i class="fas fa-clock"></i> {{tr.K_DAY.Time}}</td>
-                        <td>
+                        <td ng-style="!tr.CUR_WORK && {'color':'#dfe6e9'}"><i class="fas fa-calendar-day"></i> {{tr.K_DAY.Day}} <i class="fas fa-clock"></i> {{tr.K_DAY.Time}}</td>
+                        <td ng-style="!tr.CUR_WORK && {'color':'#dfe6e9'}">
                           <span class="animate-show-hide ng-show" ng-show="tr.TYPE==='G'"><i class="fas fa-trailer"></i></span>
                           <span class="animate-show-hide ng-show" ng-show="tr.TYPE==='R'"><i class="fas fa-hot-tub"></i></span>
                         </td>
-                        <td>{{tr.ZNR}}</td>
-                        <td>{{tr.WEIGHT}}</td>                        
-                        <td>
+                        <td ng-style="!tr.CUR_WORK && {'color':'#dfe6e9'}">{{tr.ZNR}}</td>
+                        <td ng-style="!tr.CUR_WORK && {'color':'#dfe6e9'}">{{tr.WEIGHT}}</td>                        
+                        <td ng-style="!tr.CUR_WORK && {'color':'#dfe6e9'}">
                           <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Vorwärts'"> {{zvFList.getBM(tr.PRE_ID)}} </span>
                           <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Rückwärts'"> {{zvFList.getBM(tr.POST_ID)}} </span>
                         </td>
-                        <td>
+                        <td ng-style="!tr.CUR_WORK && {'color':'#dfe6e9'}">
                           <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Vorwärts'"> {{zvFList.getBM(tr.POST_ID)}} </span>
                           <span class="animate-show-hide ng-show" ng-show="tr.DIR==='Rückwärts'"> {{zvFList.getBM(tr.PRE_ID)}} </span>
                         </td>
-                        <td>
+                        <td ng-style="!tr.CUR_WORK && {'color':'#dfe6e9'}">
                           <div class="animate-show-hide ng-show" ng-hide="tr.DELAY_INC === '' && tr.COMMENT_INC === ''">
                             <span class="animate-show-hide ng-show" ng-show="tr.DELAY_INC !== '' && tr.DELAY_INC>=0">
                               Verspätung {{tr.DELAY_INC}} min
@@ -343,7 +343,7 @@
                             </div>
                           </div>
                         </td>
-                        <td>                          
+                        <td ng-style="!tr.CUR_WORK && {'color':'#dfe6e9'}">                          
                           {{tr.DIR}}
                           <span class="animate-show-hide ng-show" ng-show="tr.CUR_WORK"><i class="fas fa-cog"></i></span>
                           <span class="animate-show-hide ng-show" ng-hide="tr.CUR_WORK || tr.FINISH"><i class="fas fa-hourglass-half"></i></span>
