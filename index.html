@@ -6,11 +6,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     <title>ZvF Stafette</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js" integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.8.2/angular.min.js" integrity="sha512-7oYXeK0OxTFxndh0erL8FsjGvrl2VMDor6fVqzlLGfwOQQqTbYsGPv4ZZ15QHfSk80doyaM0ZJdvkyDcVO7KFA==" crossorigin="anonymous"></script>
     
@@ -62,6 +60,7 @@
                 <button class="nav-link text-danger" id="nav-mfb-tab" data-bs-toggle="tab" data-bs-target="#nav-mfb" type="button" role="tab" aria-controls="nav-mfb" aria-selected="false">Wochensicht Zugnummer</button>
                 <button class="nav-link text-danger" id="nav-red-tab" data-bs-toggle="tab" data-bs-target="#nav-red" type="button" role="tab" aria-controls="nav-red" aria-selected="false">Abarbeitung Stafette</button>
                 <button class="nav-link text-light" id="nav-saved-tab" data-bs-toggle="tab" data-bs-target="#nav-saved" type="button" role="tab" aria-controls="nav-saved" aria-selected="false">...</button>
+                <button class="nav-link text-danger" id="nav-lst-tab" data-bs-toggle="tab" data-bs-target="#nav-lst" type="button" role="tab" aria-controls="nav-lst" aria-selected="false">Rote Liste</button>
                 <button class="nav-link text-light" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab" aria-controls="nav-edit" aria-selected="false">...</button>
               </div>
             </nav>
@@ -297,6 +296,29 @@
                         </tbody>
                       </table>
                     </div>
+                  </div>
+                  <div class="col-md-9">
+                    <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">
+                      Neue Betroffenheit
+                    </button>
+                    <button class="btn btn-sm btn-outline-dark" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2">
+                      Alle Bearbeitungshinweise
+                    </button>
+                    <div class="collapse multi-collapse" id="collapseExample">
+                      <div class="card card-body">
+                        Hier sind die relevanten Felder für die Eingabe einer neuen Betroffenheit.
+                        <div class="input-group mb-3">
+                          <input type="text" class="form-control" placeholder="Zugnummer" aria-label="Zugnummer" aria-describedby="button-addon2">
+                          <input type="text" class="form-control" placeholder="Verkehrstag" aria-label="Verkehrstag" aria-describedby="button-addon2">
+                          <button class="btn btn-outline-secondary" type="button" id="button-addon2">Suchen</button>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="collapse multi-collapse" id="collapseExample2">
+                      <div class="card card-body">
+                        Hier stehen alle Kommentare für diesen Korridor.
+                      </div>
+                    </div>
                   </div>                    
                   <hr>
                   <table class="table table-hover">
@@ -353,7 +375,7 @@
                           <button type="button btn-sm" ng-click="zvFList.getStafetteStatus(tr.VTSZNR);" class="btn btn-dark">
                             <i class="fas fa-search"></i>
                           </button>
-                          <button type="button btn-sm" ng-click="" class="btn btn-danger">
+                          <button type="button btn-sm" ng-click="zvFList.addToRedList(tr.VTSZNR);" class="btn btn-danger">
                             <i class="fas fa-exclamation-triangle"></i>
                           </button>
                           
@@ -400,7 +422,98 @@
                 </div>
               </div>
 
+              <div class="tab-pane fade" id="nav-lst" role="tabpanel" aria-labelledby="nav-lst-tab">
+                <div class="col-md-6">
+                  <h4 class="text-danger">
+                    Rote Liste der Züge
+                  </h4>
+                  
+                  <table class="table table-striped">
+                    <tr class="table-danger">
+                      <th>Verkehrstag</th>
+                      <th>Zugnummer</th>
+                      <th>Regionen</th>                      
+                      <th>Anzahl Korridore</th>                      
+                      <th>Details</th>
+                    </tr>
+                    <tr class="text-danger" ng-repeat="tr in zvFList.RedList | orderBy:['V_DAY.DNumber', 'ZNR']">
+                      <td>{{tr.V_DAY.DText}}</td>
+                      <td>{{tr.ZNR}}</td>
+                      <td>{{tr.REGIONEN}}</td>                      
+                      <td>{{tr.ANZ_BTK}}</td>                      
+                      <td>
+                        <button type="button btn-sm" ng-click="zvFList.getRedTrain(tr.VTSZNR);" class="btn btn-outline-danger">
+                          <i class="far fa-hand-pointer"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
 
+              <div class="tab-pane fade" id="nav-edit" role="tabpanel" aria-labelledby="nav-edit-tab">
+                <div class="col-md-10">
+                  <h4 class="text-danger">
+                    Roter Zug: Details Zugnummer {{zvFList.TrainRed[0].ZNR}}, Verkehrstag {{zvFList.TrainRed[0].V_DAY.DText}}
+                  </h4>
+                  
+                  <table class="table table-hover">
+                    <thead>
+                      <tr>
+                        <th>Betroffenheit</th>
+                        <th>Region</th>
+                        <th>Korridor</th>
+                        <th>BTS</th>
+                        <th>Reihenfolge</th>
+                        <th>Status</th>
+                        <th>Übergabe</th>
+                        <th>Kommentartext</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="tr in zvFList.TrainRed | orderBy:['K_DAY.DNumber']">                        
+                        <td><i class="fas fa-calendar-day"></i> {{tr.K_DAY.Day}} <i class="fas fa-clock"></i> {{tr.K_DAY.Time}}</td>
+                        <td>{{tr.REGION}}</td>
+                        <td>
+                          {{tr.BTK}}
+                        </td>
+                        <td>{{tr.BTS}}</td>
+                        <td>{{$index+1}}</td>
+                        <td>                              
+                          <span class="animate-show-hide ng-show" ng-show="tr.CUR_WORK"><i class="fas fa-cog"></i></span>
+                          <span class="animate-show-hide ng-show" ng-hide="tr.CUR_WORK || tr.FINISH"><i class="fas fa-hourglass-half"></i></span>
+                          <span class="animate-show-hide ng-show" ng-show="tr.FINISH"><i class="fas fa-flag-checkered"></i></span>
+                          <span class="animate-show-hide ng-show" ng-show="tr.CUR_WORK && tr.DIR==='Vorwärts'"> <i class="fas fa-angle-double-down"></i> </span>
+                          <span class="animate-show-hide ng-show" ng-show="tr.CUR_WORK && tr.DIR==='Rückwärts'"> <i class="fas fa-angle-double-up"></i> </span>
+                        </td>
+                        <td>
+                          <button type="button btn-sm animate-show-hide ng-show" ng-hide="tr.DELAY_HERE === ''" ng-click="" class="btn btn-outline-danger">
+                            <i class="far fa-trash-alt"></i>
+                          </button>
+                          <span class="animate-show-hide ng-show" ng-show="tr.DELAY_HERE !== '' && tr.DELAY_HERE>=0">
+                            Verspätung {{tr.DELAY_HERE}} min
+                          </span>
+                          <span class="animate-show-hide ng-show" ng-show="tr.DELAY_HERE !== '' && tr.DELAY_HERE<0">
+                            Vorplanfahrt {{-tr.DELAY_HERE}} min
+                          </span>
+                          <span class="animate-show-hide ng-show" ng-show="tr.DELAY_HERE === ''">
+                            ---
+                          </span>
+                        </td>
+                        <td>
+                          <button type="button btn-sm animate-show-hide ng-show" ng-hide="tr.COMMENT_HERE === ''" ng-click="" class="btn btn-outline-danger">
+                            <i class="far fa-trash-alt"></i>
+                          </button>
+                          {{tr.COMMENT_HERE}}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                </div>
+              </div>
+
+              
             </div> 
           </div>
 

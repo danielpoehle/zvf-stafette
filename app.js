@@ -25,6 +25,8 @@
         zvFList.delay = 0;
         zvFList.comment = '';
         zvFList.StafetteStatus = [];
+        zvFList.RedList = [];
+        zvFList.TrainRed = [];
         
 
         zvFList.assignTrains = function(){
@@ -190,6 +192,26 @@
                 });
                 
             }
+        };
+
+        zvFList.addToRedList = function(vtsznr){
+            let trains = zvFList.BTKlist.filter((t) => t.VTSZNR === vtsznr);
+            let reg = trains.map((t) => t.REGION);
+            reg = reg.filter((item, index) => reg.indexOf(item)===index).sort().join(', ');
+            zvFList.RedList = zvFList.RedList.filter((t) => t.VTSZNR !== vtsznr);
+            zvFList.RedList.push({
+                'VTSZNR': trains[0].VTSZNR,
+                'ZNR': trains[0].ZNR,
+                'V_DAY': trains[0].V_DAY,
+                'ANZ_BTK': trains.length,
+                'REGIONEN': reg,
+                'trains': trains
+            });
+        };
+
+        zvFList.getRedTrain = function(vtsznr){
+            zvFList.TrainRed = zvFList.BTKlist.filter((t) => t.VTSZNR === vtsznr);
+            document.getElementById("nav-edit-tab").click();
         };
 
         zvFList.getStafetteStatus = function(vtsznr){
