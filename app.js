@@ -12,8 +12,9 @@
         zvFList.Filename = 'bla';
         zvFList.selRegion = '';
         zvFList.loadComplete = false;
-        zvFList.startDate = luxon.DateTime.fromFormat('01.12.2021', 'dd.MM.yyyy');
+        zvFList.startDate = luxon.DateTime.fromFormat('11.04.2022', 'dd.MM.yyyy');
         zvFList.BauList = [];
+        zvFList.FilteredBauList = [];
         zvFList.Groups = [];
         zvFList.DetailGroup = [];
         zvFList.selGroup = '';
@@ -31,92 +32,53 @@
 
         zvFList.assignTrains = function(){
             resetGroups();
-            let trainsToRG = [
-                {'name': 'OST', 'id': 1, 'trains': []},
-                {'name': 'NORD', 'id': 2, 'trains': []},
-                {'name': 'WEST', 'id': 3, 'trains': []},
-                {'name': 'SÜDOST', 'id': 4, 'trains': []},
-                {'name': 'MITTE', 'id': 5, 'trains': []},
-                {'name': 'SÜDWEST', 'id': 6, 'trains': []},
-                {'name': 'SÜD', 'id': 7, 'trains': []}
-            ];
 
-            for (let i = 1; i <= trainsToRG.length; i+=1) {
-                const element = trainsToRG.find((t) => t.id === i);
-                let lst = zvFList.BauList.filter((t) => t.Region === element.name && 
-                                                        t.Konflikt.DNumber >= this.startDate.ts && 
-                                                        t.Konflikt.DNumber < this.startDate.plus({ days: 7 }).ts).map((t) => {
-                                                            const container = {};
-                                                            container.Zugnummer = t.Zugnummer;
-                                                            container.Verkehrstag = t.Verkehrstag;
-                                                            container.Vorgangsnummer = t.Vorgangsnummer;
-                                                            container.ZugartFv = t.ZugartFv;
-                                                            container.Konflikt = t.Konflikt;
-                                                            container.Streckennummer = t.Streckennummer; 
-                                                            container.VTSZNR = t.VTSZNR;                                                           
-                                                            return container;
-                                                        });
-                lst = lst.filter((item, index) => { return(lst.findIndex(x => x.VTSZNR === item.VTSZNR)===index);}).sort((a,b) => a.Zugnummer-b.Zugnummer);
-                element.trains = lst;
-            }
-            //console.log(trainsToRG);  
-            
-            let allTrains = zvFList.BauList.filter((t) => t.Konflikt.DNumber >= this.startDate.ts && 
-                                                      t.Konflikt.DNumber < this.startDate.plus({ days: 7 }).ts).map((t) => {
-                                                        const container = {};
-                                                        container.Zugnummer = t.Zugnummer;
-                                                        container.Verkehrstag = t.Verkehrstag;
-                                                        container.Vorgangsnummer = t.Vorgangsnummer;
-                                                        container.ZugartFv = t.ZugartFv;
-                                                        container.Konflikt = t.Konflikt;
-                                                        container.Streckennummer = t.Streckennummer; 
-                                                        container.VTSZNR = t.VTSZNR;                                                           
-                                                        return container;
-                                                      });
-            allTrains = allTrains.filter((item, index) => {return(allTrains.findIndex(x => x.VTSZNR === item.VTSZNR)===index);}).sort((a,b) => a.Zugnummer-b.Zugnummer);             
+            zvFList.FilteredBauList = zvFList.BauList.filter((t) => t.Konflikt.DNumber >= this.startDate.ts && 
+                                                        t.Konflikt.DNumber < this.startDate.plus({ days: 7 }).ts);
 
-            for (let i = 1; i <= trainsToRG.length; i+=1) {
-                let trains = trainsToRG.find((t) => t.id === i).trains;
-                let other = trainsToRG.filter((t) => t.id !== i).map((t) => t.trains).flat(1);
-                let uniTrains = trains.filter((t) => other.findIndex(x => x.VTSZNR === t.VTSZNR)===-1);
-                zvFList.Groups.find((t) => t.id === i).trains = uniTrains; 
-                allTrains = allTrains.filter((t) => uniTrains.findIndex(x => x.VTSZNR === t.VTSZNR)===-1);
-                for (let j = i+1; j <= trainsToRG.length; j+=1) {
-                    let secTrains = trainsToRG.find((t) => t.id === j).trains.filter((t) => trains.findIndex(x => x.VTSZNR === t.VTSZNR) !== -1);
-                    other = trainsToRG.filter((t) => t.id !== i && t.id !== j).map((t) => t.trains).flat(1);
-                    uniTrains = secTrains.filter((t) => other.findIndex(x => x.VTSZNR === t.VTSZNR)===-1);
-                    zvFList.Groups.find((t) => t.id === (10*i+j)).trains = uniTrains;
-                    allTrains = allTrains.filter((t) => uniTrains.findIndex(x => x.VTSZNR === t.VTSZNR)===-1);
+            let znr = zvFList.FilteredBauList.map((t) => t.Zugnummer);
+            znr = znr.filter((item, index) => znr.indexOf(item)===index);
+
+            for (let i = 0; i < znr.length; i+=1) {                
+                let affections = zvFList.FilteredBauList.filter((t) => t.Zugnummer === znr[i]);
+                let region = affections.map((t) => t.Region);
+                region = region.filter((item, index) => region.indexOf(item)===index);
+                if(region.length > 2){
+                    zvFList.Groups.find((t) => t.id === 1000).trains.push(affections);
+                }else if(region.length === 1){
+                    zvFList.Groups.find((t) => region[0] === t.rgIds[0] && t.rgIds.length === 1).trains.push(affections);
+                }else{
+                    //region has two different elements
+                    zvFList.Groups.find((t) => t.rgIds.includes(region[0]) && t.rgIds.includes(region[1]) && t.rgIds.length === 2).trains.push(affections);
                 }
             }
-            zvFList.Groups.find((t) => t.id === 1000).trains = allTrains;
             console.log(zvFList.Groups);             
         };
 
         zvFList.showGroup = function(id){            
             zvFList.DetailGroup = [];
             let grp = zvFList.Groups.find((t) => t.id === id);
+            console.log(grp);
             zvFList.selGroup = grp.name;
-            let assignedTrains = grp.trains;
-            let nrs = assignedTrains.map((x) => x.Zugnummer);
-            nrs = nrs.filter((item, index) => {return(nrs.findIndex(x => x === item)===index);});
-            for (let i = 0; i < nrs.length; i+=1) {
-                const nr = nrs[i];
-                let d = assignedTrains.filter(t => t.Zugnummer === nr).map(t => t.Verkehrstag).sort((a,b) => a.DNumber-b.DNumber);
+            for (let i = 0; i < grp.trains.length; i+=1) {
+                let days = grp.trains[i].map((t) => t.Verkehrstag.DText).sort();                
+                days = days.filter((item, index) => days.indexOf(item)===index); 
+                let rg = grp.trains[i].map((t) => t.Region).sort();  
+                rg = rg.filter((item, index) => rg.indexOf(item)===index);             
                 zvFList.DetailGroup.push({
-                    'znr': nr,
-                    'type': assignedTrains.find(t => t.Zugnummer === nr).ZugartFv,
-                    'days': d.map(t => t.DNumber),
-                    'dayList': d.map(t => t.DText).join(', ')
+                    'znr': grp.trains[i][0].Zugnummer,
+                    'type': grp.trains[i][0].ZugartFv,
+                    'reg': rg.join(', '),
+                    'VdayList': days.join(', ')
                 });
             }
             document.getElementById("nav-profile-tab").click();
         };
 
-        zvFList.showTrain = function(znr, vts){
+        zvFList.showTrain = function(znr){
             zvFList.TrainDetail = [];
             zvFList.selTrain = znr;
-            let lst = zvFList.BauList.filter((t) => t.Zugnummer === znr && vts.includes(t.Verkehrstag.DNumber));
+            let lst = zvFList.FilteredBauList.filter((t) => t.Zugnummer === znr);
             let days = lst.map(t => t.Verkehrstag.DNumber);
             days = days.filter((item, index) => days.indexOf(item)===index).sort();
             for (let i = 0; i < days.length; i+=1) {                
@@ -134,10 +96,28 @@
             document.getElementById("nav-mfb-tab").click();
         };
 
-        zvFList.setOrder = function(d, ascending){
-            let orderedTrains = ascending? d.trains.sort((a,b) => a.Konflikt.DNumber-b.Konflikt.DNumber): d.trains.sort((a,b) => b.Konflikt.DNumber-a.Konflikt.DNumber);
-            zvFList.BTKlist = zvFList.BTKlist.filter((t) => t.VTSZNR !== orderedTrains[0].VTSZNR);
+        zvFList.setOrder = function(d, ascending){            
+            zvFList.BTKlist = zvFList.BTKlist.filter((t) => t.VTSZNR !== d.trains[0].VTSZNR);
             d.dir = ascending? 'Vorwärts' : 'Rückwärts';
+            createOrder(d, ascending);
+            console.log(zvFList.BTKlist);
+        };
+
+        zvFList.setSplit = function(d, index){            
+            zvFList.BTKlist = zvFList.BTKlist.filter((t) => t.VTSZNR !== d.trains[0].VTSZNR);
+            d.dir = 'Split';
+            let ordered = d.trains.sort((a,b) => a.Konflikt.DNumber-b.Konflikt.DNumber);
+            let asc = {...d};
+            asc.trains = ordered.slice(0,index+1);
+            createOrder(asc, false);
+            let desc = {...d};
+            desc.trains = ordered.slice(index);
+            createOrder(desc, true);
+            console.log(zvFList.BTKlist);
+        };
+
+        function createOrder(d, ascending){
+            let orderedTrains = ascending? d.trains.sort((a,b) => a.Konflikt.DNumber-b.Konflikt.DNumber): d.trains.sort((a,b) => b.Konflikt.DNumber-a.Konflikt.DNumber);
             let indArray = zvFList.BTKlist.map((t) => t.ID);
             let maxInd = Math.max(0, ...indArray);
             for (let i = 0; i < orderedTrains.length; i+=1) {
@@ -164,7 +144,6 @@
                     'BTS': orderedTrains[i].Betriebsstelle
                 });                
             }
-            console.log(zvFList.BTKlist);
         };
 
         zvFList.setRegion = function(rg){
@@ -269,35 +248,35 @@
 
         function resetGroups(){
             zvFList.Groups = [
-                {'name': 'OST', 'id': 1, 'trains': []},
-                {'name': 'NORD', 'id': 2, 'trains': []},
-                {'name': 'WEST', 'id': 3, 'trains': []},
-                {'name': 'SÜDOST', 'id': 4, 'trains': []},
-                {'name': 'MITTE', 'id': 5, 'trains': []},
-                {'name': 'SÜDWEST', 'id': 6, 'trains': []},
-                {'name': 'SÜD', 'id': 7, 'trains': []},
-                {'name': 'OST-NORD', 'id': 12, 'trains': []},
-                {'name': 'OST-WEST', 'id': 13, 'trains': []},
-                {'name': 'OST-SÜDOST', 'id': 14, 'trains': []},
-                {'name': 'OST-MITTE', 'id': 15, 'trains': []},
-                {'name': 'OST-SÜDWEST', 'id': 16, 'trains': []},
-                {'name': 'OST-SÜD', 'id': 17, 'trains': []},
-                {'name': 'NORD-WEST', 'id': 23, 'trains': []},
-                {'name': 'NORD-SÜDOST', 'id': 24, 'trains': []},
-                {'name': 'NORD-MITTE', 'id': 25, 'trains': []},
-                {'name': 'NORD-SÜDWEST', 'id': 26, 'trains': []},
-                {'name': 'NORD-SÜD', 'id': 27, 'trains': []},
-                {'name': 'WEST-SÜDOST', 'id': 34, 'trains': []},
-                {'name': 'WEST-MITTE', 'id': 35, 'trains': []},
-                {'name': 'WEST-SÜDWEST', 'id': 36, 'trains': []},
-                {'name': 'WEST-SÜD', 'id': 37, 'trains': []},
-                {'name': 'SÜDOST-MITTE', 'id': 45, 'trains': []},
-                {'name': 'SÜDOST-SÜDWEST', 'id': 46, 'trains': []},
-                {'name': 'SÜDOST-SÜD', 'id': 47, 'trains': []},
-                {'name': 'MITTE-SÜDWEST', 'id': 56, 'trains': []},
-                {'name': 'MITTE-SÜD', 'id': 57, 'trains': []},
-                {'name': 'SÜDWEST-SÜD', 'id': 67, 'trains': []},
-                {'name': 'Betroffenheit 3+ Regionen', 'id': 1000, 'trains': []}
+                {'name': 'OST', 'id': 1, 'trains': [], 'rgIds': ['OST']},
+                {'name': 'NORD', 'id': 2, 'trains': [], 'rgIds': ['NORD']},
+                {'name': 'WEST', 'id': 3, 'trains': [], 'rgIds': ['WEST']},
+                {'name': 'SÜDOST', 'id': 4, 'trains': [], 'rgIds': ['SÜDOST']},
+                {'name': 'MITTE', 'id': 5, 'trains': [], 'rgIds': ['MITTE']},
+                {'name': 'SÜDWEST', 'id': 6, 'trains': [], 'rgIds': ['SÜDWEST']},
+                {'name': 'SÜD', 'id': 7, 'trains': [], 'rgIds': ['SÜD']},
+                {'name': 'OST-NORD', 'id': 12, 'trains': [], 'rgIds': ['OST','NORD']},
+                {'name': 'OST-WEST', 'id': 13, 'trains': [], 'rgIds': ['OST','WEST']},
+                {'name': 'OST-SÜDOST', 'id': 14, 'trains': [], 'rgIds': ['OST','SÜDOST']},
+                {'name': 'OST-MITTE', 'id': 15, 'trains': [], 'rgIds': ['OST','MITTE']},
+                {'name': 'OST-SÜDWEST', 'id': 16, 'trains': [], 'rgIds': ['OST','SÜDWEST']},
+                {'name': 'OST-SÜD', 'id': 17, 'trains': [], 'rgIds': ['OST','SÜD']},
+                {'name': 'NORD-WEST', 'id': 23, 'trains': [], 'rgIds': ['NORD','WEST']},
+                {'name': 'NORD-SÜDOST', 'id': 24, 'trains': [], 'rgIds': ['NORD','SÜDOST']},
+                {'name': 'NORD-MITTE', 'id': 25, 'trains': [], 'rgIds': ['NORD','MITTE']},
+                {'name': 'NORD-SÜDWEST', 'id': 26, 'trains': [], 'rgIds': ['NORD','SÜDWEST']},
+                {'name': 'NORD-SÜD', 'id': 27, 'trains': [], 'rgIds': ['NORD','SÜD']},
+                {'name': 'WEST-SÜDOST', 'id': 34, 'trains': [], 'rgIds': ['WEST','SÜDOST']},
+                {'name': 'WEST-MITTE', 'id': 35, 'trains': [], 'rgIds': ['WEST','MITTE']},
+                {'name': 'WEST-SÜDWEST', 'id': 36, 'trains': [], 'rgIds': ['WEST','SÜDWEST']},
+                {'name': 'WEST-SÜD', 'id': 37, 'trains': [], 'rgIds': ['WEST','SÜD']},
+                {'name': 'SÜDOST-MITTE', 'id': 45, 'trains': [], 'rgIds': ['SÜDOST','MITTE']},
+                {'name': 'SÜDOST-SÜDWEST', 'id': 46, 'trains': [], 'rgIds': ['SÜDOST','SÜDWEST']},
+                {'name': 'SÜDOST-SÜD', 'id': 47, 'trains': [], 'rgIds': ['SÜDOST','SÜD']},
+                {'name': 'MITTE-SÜDWEST', 'id': 56, 'trains': [], 'rgIds': ['MITTE','SÜDWEST']},
+                {'name': 'MITTE-SÜD', 'id': 57, 'trains': [], 'rgIds': ['MITTE','SÜD']},
+                {'name': 'SÜDWEST-SÜD', 'id': 67, 'trains': [], 'rgIds': ['SÜDWEST','SÜD']},
+                {'name': 'Betroffenheit 3+ Regionen', 'id': 1000, 'trains': [], 'rgIds': ['alle']}
             ];
         };
         

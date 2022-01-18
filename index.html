@@ -71,7 +71,7 @@
                     <thead>
                       <tr>
                         <th>Betroffenheit durch Bau</th>
-                        <th>Summe Verkehrstage der betroffenen Züge</th>
+                        <th>Anzal betroffener Züge</th>
                         <th>&nbsp;</th>
                       </tr>
                     </thead>
@@ -91,14 +91,15 @@
               </div>
 
               <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-                <div class="col-md-8">
+                <div class="col-md-10">
                   <h4>Wochensicht {{zvFList.selGroup}}</h4>
                     <table class="table table-hover">
                       <thead>
                         <tr>
                           <th>Rz/Gz</th>
                           <th>Zugnummer</th>
-                          <th>Verkehrstage</th>
+                          <th>Verkehrstage mit Betroffenheit</th>
+                          <th>Regionen</th>
                           <th>&nbsp;</th>
                         </tr>
                       </thead>
@@ -109,9 +110,10 @@
                             <span class="animate-show-hide ng-show" ng-show="tr.type==='R'"><i class="fas fa-hot-tub"></i></span>
                           </td>
                           <td>{{tr.znr}}</td>
-                          <td>{{tr.dayList}}</td>
+                          <td><i class="fas fa-calendar-day"></i> {{tr.VdayList}}</td>
+                          <td><i class="fas fa-globe-africa"></i> {{tr.reg}}</td>
                           <td>
-                            <button type="button btn-sm" ng-click="zvFList.showTrain(tr.znr, tr.days);" class="btn btn-outline-secondary">
+                            <button type="button btn-sm" ng-click="zvFList.showTrain(tr.znr);" class="btn btn-outline-secondary">
                               <i class="fas fa-pencil-alt"></i>
                             </button>
                           </td>
@@ -133,10 +135,8 @@
                         <tr>
                           <td ng-repeat="d in zvFList.TrainDetail">
                             <table class="table table-sm table-borderless">
-                              <tr>
-                                <td><button type="button" ng-click="zvFList.setOrder(d, true);" class="btn btn-secondary btn-lg"><i class="far fa-arrow-alt-circle-down"></i></button></td>
-                                <td><button type="button" ng-click="zvFList.setOrder(d, false);" class="btn btn-secondary btn-lg"><i class="far fa-arrow-alt-circle-up"></i></button></td>
-                                <td>{{d.dir}}</td>
+                              <tr>                                
+                                <td><span class="animate-show-hide ng-show" ng-show="d.trains.length>1">Bearbeitung </span>{{d.dir}} &nbsp; </td>
                               </tr>
                             </table>
                             <table class="table table-sm">
@@ -145,8 +145,21 @@
                                 <th>{{d.day.DText}}</th>
                               </tr>
                               <tr ng-repeat="tr in d.trains | orderBy:['Konflikt.DNumber']">
-                                <td ng-style="{'background-color': tr.Color, 'color': 'white'}"><i class="fas fa-globe-africa"></i> <b>{{tr.Region}}</b><br><i class="fas fa-road"></i> {{tr.Streckennummer}}<br>{{tr.Vorgangsnummer}}<br><i class="fas fa-calendar-day"></i> {{tr.Konflikt.Day}}</td>
-                                <td ng-style="{'background-color': tr.Color, 'color': 'white'}">&nbsp;<br><i class="fas fa-map-marker-alt"></i> {{tr.Betriebsstelle}}<br><i class="fas fa-snowplow"></i> {{tr['Art der bVE']}}<br><i class="far fa-clock"></i> {{tr.Konflikt.Time}}</td>
+                                <td ng-style="{'background-color': tr.Color, 'color': 'white'}">
+                                  <i class="fas fa-globe-africa"></i> <b>{{tr.Region}}</b>
+                                  <br>{{tr.Vorgangsnummer}}
+                                  <br><i class="fas fa-snowplow"></i> <small>{{tr['Art der bVE']}}</small> 
+                                  <br><i class="fas fa-calendar-day"></i> {{tr.Konflikt.Day}}
+                                </td>
+                                <td ng-style="{'background-color': tr.Color, 'color': 'white'}">
+                                  <button type="button" ng-click="zvFList.setOrder(d, true);" class="btn btn-light btn-sm animate-show-hide ng-show" ng-show="$first && d.trains.length>1"><i class="fas fa-cog"></i><i class="fas fa-long-arrow-alt-down"></i></button>
+                                  <button type="button" ng-click="zvFList.setSplit(d, $index);" class="btn btn-light btn-sm animate-show-hide ng-show" ng-show="$middle && d.trains.length>1"><i class="fas fa-cog"></i><i class="fas fa-arrows-alt-v"></i></button>
+                                  <button type="button" ng-click="zvFList.setOrder(d, false);" class="btn btn-light btn-sm animate-show-hide ng-show" ng-show="$last && d.trains.length>1"><i class="fas fa-cog"></i><i class="fas fa-long-arrow-alt-up"></i></button>
+
+                                  <br><i class="fas fa-road"></i> {{tr.Streckennummer}}
+                                  <br><i class="fas fa-map-marker-alt"></i> {{tr.Betriebsstelle}}
+                                  <br><i class="far fa-clock"></i> {{tr.Konflikt.Time}}
+                                </td>
                               </tr>
                             </table>
                           </td>                          
