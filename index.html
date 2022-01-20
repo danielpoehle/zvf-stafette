@@ -368,7 +368,7 @@
                         <td ng-style="!tr.CUR_WORK && {'color':'#dfe6e9'}">
                           <div class="animate-show-hide ng-show" ng-hide="tr.DELAY_INC === '' && tr.COMMENT_INC === ''">
                             <span class="animate-show-hide ng-show" ng-show="tr.DELAY_INC !== '' && tr.DELAY_INC>=0">
-                              Verspätung {{tr.DELAY_INC}} min
+                              Verspätung {{tr.DELAY_INC}} min                              
                             </span>
                             <span class="animate-show-hide ng-show" ng-show="tr.DELAY_INC !== '' && tr.DELAY_INC<0">
                               Vorplanfahrt {{-tr.DELAY_INC}} min
@@ -420,6 +420,9 @@
                           <div class="animate-show-hide ng-show" ng-hide="tr.DELAY_HERE === '' && tr.COMMENT_HERE === ''">
                             <span class="animate-show-hide ng-show" ng-show="tr.DELAY_HERE !== '' && tr.DELAY_HERE>=0">
                               Verspätung {{tr.DELAY_HERE}} min
+                              <div class="animate-show-hide ng-show text-danger" ng-show="tr.DELAY_HERE >= tr.MAX_DELAY">
+                                Durch die Verspätung gibt es eine neue Betroffenheit in {{tr.NEXT_TSP}}!
+                              </div>
                             </span>
                             <span class="animate-show-hide ng-show" ng-show="tr.DELAY_HERE !== '' && tr.DELAY_HERE<0">
                               Vorplanfahrt {{-tr.DELAY_HERE}} min

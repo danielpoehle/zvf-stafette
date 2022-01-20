@@ -141,7 +141,9 @@
                     'DELAY_INC': '',
                     'COMMENT_INC': '',
                     'REGION': orderedTrains[i].Region,
-                    'BTS': orderedTrains[i].Betriebsstelle
+                    'BTS': orderedTrains[i].Betriebsstelle,
+                    'MAX_DELAY': orderedTrains[i]['Nächste TSP Abstand'] === ''? 100000 : Math.ceil(orderedTrains[i]['Nächste TSP Abstand']/60.0),
+                    'NEXT_TSP': orderedTrains[i]['Nächste TSP Btst']
                 });                
             }
         };
