@@ -12,7 +12,7 @@
         zvFList.Filename = 'bla';
         zvFList.selRegion = '';
         zvFList.loadComplete = false;
-        zvFList.startDate = luxon.DateTime.fromFormat('11.04.2022', 'dd.MM.yyyy');
+        zvFList.startDate = luxon.DateTime.fromFormat('16.11.2022', 'dd.MM.yyyy');
         zvFList.BauList = [];
         zvFList.FilteredBauList = [];
         zvFList.Groups = [];
