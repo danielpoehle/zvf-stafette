@@ -147,7 +147,7 @@
                               <tr ng-repeat="tr in d.trains | orderBy:['Konflikt.DNumber']">
                                 <td ng-style="{'background-color': tr.Color, 'color': 'white'}">
                                   <i class="fas fa-globe-africa"></i> <b>{{tr.Region}}</b>
-                                  <br>{{tr.Vorgangsnummer}}
+                                  <br>{{tr['Korridor Name']}}
                                   <br><i class="fas fa-snowplow"></i> <small>{{tr['Art der bVE']}}</small> 
                                   <br><i class="fas fa-calendar-day"></i> {{tr.Konflikt.Day}}
                                 </td>
